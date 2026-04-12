@@ -1,3 +1,6 @@
+console.log("APP.JS LOADED");
+
+
 import express from "express";
 // import authRoutes from "./routes/auth.routes.js";
 // import usersRoutes from "./routes/users.routes.js";
