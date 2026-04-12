@@ -15,7 +15,7 @@ app.use(express.json());
 // app.use("/api/auth", authRoutes);
 // app.use("/api/users", usersRoutes);
 
-app.get("/api/health", (req, res) => {
+app.get("/health", (req, res) => {
   res.json({ ok: true });
 });
 
