@@ -40,7 +40,7 @@ router.post('/register', async (req, res) => {
 
     // If registering as driver, insert into drivers table
     if (role === 'driver') {
-      if (!licence || !car_plate || !car_type) {
+      if (!license_number) {
         return res.status(400).json({ error: 'Missing required driver fields.' });
       }
       await pool.query(

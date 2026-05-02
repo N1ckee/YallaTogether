@@ -27,21 +27,22 @@
         <input type="tel" id="phone_number" name="phone_number" required>
         <br>
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+        <input type="password" id="password" name="password" required> 
         <br>
-        
+
         <!-- Information needed for registration of a driver--->
         <label for="driver">Register as a driver?</label>
         <input type="checkbox" id="driver" name="role" value="driver">
-        
+
         <span style="display:none;" id="license_field">
             <label for="license_number">License Number:</label>
             <input type="text" id="license_number" name="license_number">
         </span>
+        <p style="color: red;" id="error_message">Error</p>
         <button type="submit">Register</button>
       </form>
     </div>
-
+ 
     <div id="LoginPage">
       <h1>Login</h1>
       <form id="loginForm">
@@ -126,6 +127,33 @@
         license_field.style.display = 'none';
       }
     });
+
+  // error handeling
+    document.getElementById('register_form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      const response = await fetch('/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        document.getElementById('error_message').textContent = result.error || 'Registration failed';
+        document.getElementById('error_message').style.display = 'block';
+      } else {
+        // Registration successful, redirect or show success
+        window.location.href = '/login';
+      }
+    } catch (err) {
+      document.getElementById('error_message').textContent = 'Network error';
+      document.getElementById('error_message').style.display = 'block';
+    }
+  });
+
 
 
   </script>
