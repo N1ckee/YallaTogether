@@ -68,7 +68,7 @@ router.post('/login', async (req, res) => {
     }
 
     const result = await pool.query(
-      `SELECT id, username, email, password_hash, role
+      `SELECT user_id, username, email, password_hash, role
        FROM users
        WHERE email = $1 OR username = $1
        LIMIT 1`,
@@ -93,7 +93,7 @@ router.post('/login', async (req, res) => {
     // Generate JWT token after verifying credentials
     const token = jwt.sign(
       {
-        id: user.id,
+        user_id: user.user_id,
         username: user.username,
         role: user.role
       },
