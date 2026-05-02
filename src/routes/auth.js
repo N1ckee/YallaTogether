@@ -38,7 +38,7 @@ router.post('/register', async (req, res) => {
       'insert into users (first_name, last_name, username, email, phone_number, password_hash, role, user_rating, icon_url) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id',
       [first_name, last_name, username, email, phone_number, password_hash, role || "user", user_rating || 0, icon_url || null]
     );
-    const user_id = userResult.rows[0].id;
+    const user_id = userResult.rows[0].user_id;
 
     // If registering as driver, insert into drivers table
     if (role === 'driver') {
