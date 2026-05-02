@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link href="css/style.css" rel="stylesheet">
+    <script src="js/register.js" defer></script>
+  </head>
+  <body>
+    <div id="registerPage">
+      <h1>Register</h1>
+      <form id="register_form">
+        <!-- Information needed for registration of a user--->
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name" required>
+        <br>
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" name="last_name" required>
+        <br>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <br>
+        <label for="phone_number">Phone Number:</label>
+        <input type="tel" id="phone_number" name="phone_number" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required> 
+        <br>
+
+        <!-- Information needed for registration of a driver--->
+        <label for="driver">Register as a driver?</label>
+        <input type="checkbox" id="driver" name="role" value="driver">
+
+        <span style="display:none;" id="license_field">
+            <label for="license_number">License Number:</label>
+            <input type="text" id="license_number" name="license_number">
+        </span>
+        <p style="color: red;" id="error_message">Error</p>
+        <button type="submit">Register</button>
+      </form>
+    </div>
+  </body>
+</html>
