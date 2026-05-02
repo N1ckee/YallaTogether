@@ -15,7 +15,7 @@ router.get("/test", (req, res) => {
 });
 
 // REGISTER
-router.post('/auth/register', async (req, res) => {
+router.post('/register', async (req, res) => {
   const {
     first_name,
     last_name,
