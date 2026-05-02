@@ -29,12 +29,14 @@ router.post('/register', async (req, res) => {
     license_number
   } = req.body;
 
+  console.log("Received registration data:", req.body);
+
   const password_hash = await bcrypt.hash(password, 10);
   try {
     // insert into users table
     const userResult = await pool.query(
       'insert into users (first_name, last_name, username, email, phone_number, password_hash, role, user_rating, icon_url) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning id',
-      [first_name, last_name, username, email, phone_number, password_hash, role, user_rating || 0, icon_url || null]
+      [first_name, last_name, username, email, phone_number, password_hash, role || "user", user_rating || 0, icon_url || null]
     );
     const user_id = userResult.rows[0].id;
 
