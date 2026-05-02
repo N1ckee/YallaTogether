@@ -1,9 +1,9 @@
-import express from "express";
+import { Router } from "express";
 import bcrypt from "bcrypt";
-import pool from "./db.js";
+import pool from "../db/client.js";
 import jwt from "jsonwebtoken";
 
-const router = express.Router();
+const router = Router();
 
 // TEST
 router.get("/test", (req, res) => {
