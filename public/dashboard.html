@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard</title>
+    <link href="css/style.css" rel="stylesheet">
+    <script src="js/dashboard.js"></script>
+  </head>
+  <body>
+    <div class="profile-container">
+      <img src="images/profile.jpg" alt="Profile Picture" class="profile-picture">
+      <p><strong><span id="username">Username</span></strong></p>
+      <p>rating: 0/5<span id="rating"></span></p>
+      <a href="edit_profile.html"><i>edit profile</i></a>
+    </div>
+    <div class="ride-container">
+      <input type="text" id="ride-search" placeholder="Search for rides...">
+      <div id="ride-list">
+      </div>
+    </div>
+    <div class="map-container">
+      <div id="map"></div>
+    </div>
+  </body>
+</html>

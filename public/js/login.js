@@ -14,7 +14,7 @@ document.getElementById('login_form').addEventListener('submit', async function 
     const result = await response.json();
     if (response.ok) {
       // Success: handle accordingly (e.g., redirect or show message)
-      window.location.href = '/dashboard';
+      window.location.href = '../dashboard.html'; // Redirect to dashboard or desired page
     } else {
       // Error: show error message
       document.getElementById('error_message').textContent = result.error || 'Login failed';
