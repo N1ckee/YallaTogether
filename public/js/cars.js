@@ -3,7 +3,7 @@
 
 window.addEventListener("load", async () => {
   try {
-    const response = await fetch("/api/cars");
+    const response = await fetch("/cars/get");
 
     if (!response.ok) {
       throw new Error("Failed to fetch cars");
