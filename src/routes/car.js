@@ -37,7 +37,7 @@ router.post('/add', async (req, res) => {
   try {
     // Ensure user is authenticated and verified
     if (!req.user || !req.user.verified) {
-      return res.status(403).json({ error: 'User not verified' });
+      return res.status(403).json({ error: 'user not verified' });
     }
 
     const car_result = await pool.query(
