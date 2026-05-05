@@ -40,7 +40,7 @@ document.getElementById('add_car_form').addEventListener('submit', async functio
   const data = Object.fromEntries(formData.entries());
 
   try {
-    const response = await fetch('/auth/login', {
+    const response = await fetch('/cars/add', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
