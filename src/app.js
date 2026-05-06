@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import auth_routes from "./routes/auth.js";
 import user_routes from "./routes/user.js";
 import car_routes from "./routes/car.js";
+import path_routes from "./routes/path.js";
 import path from "path";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -17,6 +18,7 @@ app.use(express.static(publicDir));
 app.use("/auth", auth_routes);
 app.use("/users", user_routes);
 app.use("/cars", car_routes);
+app.use("/paths", path_routes);
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(publicDir, "startpage.html"));

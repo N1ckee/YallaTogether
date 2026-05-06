@@ -8,15 +8,15 @@
     <script src="js/profile.js" defer></script>
   </head>
   <body>
-    <main id="profilePage">
+    <main id="profilePage" style="display: none;">
       <nav>
         <a href="dashboard.html">Back to Dashboard</a>
-        <a href="cars.html">My Cars</a>
+        <a href="cars.html" id="my_cars_link" style="display: none;">My Cars</a>
       </nav>
 
       <section>
         <h1>Profile</h1>
-        <form id="become_driver_form">
+        <form id="become_driver_form" style="display: none;">
           <h2>Register as a driver</h2>
           <label for="license_number">License Number:</label>
           <input type="text" id="license_number" name="license_number" required>
@@ -24,6 +24,7 @@
           <p style="color: green; display: none;" id="driver_success_message">Success</p>
           <button type="submit">Register as Driver</button>
         </form>
+        <p id="driver_status_message" style="display: none;">You are registered as a driver.</p>
       </section>
     </main>
   </body>

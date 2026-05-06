@@ -1,32 +1,60 @@
 
-// fetch and display cars on page load
+const carsPage = document.getElementById("cars_page");
+const errorMessage = document.getElementById("error_message");
+
+async function loadCurrentUser() {
+  const response = await fetch("/users/me");
+
+  if (!response.ok) {
+    return null;
+  }
+
+  return response.json();
+}
+
+async function loadCars() {
+  const response = await fetch("/cars/get");
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch cars");
+  }
+
+  const cars = await response.json();
+  const list = document.getElementById("cars");
+
+  list.innerHTML = "";
+
+  cars.forEach((car) => {
+    const li = document.createElement("li");
+
+    li.textContent =
+      `${car.year} ${car.make} ${car.model} ` +
+      `(${car.color ?? "unknown color"}) - ` +
+      `Plate: ${car.license_plate}, ` +
+      `Seats: ${car.passenger_capacity}, ` +
+      `Fuel: ${car.fuel_type ?? "unknown"}, ` +
+      `Efficiency: ${car.fuel_efficiency ?? "unknown"}`;
+
+    list.appendChild(li);
+  });
+}
 
 window.addEventListener("load", async () => {
   try {
-    const response = await fetch("/cars/get");
+    const user = await loadCurrentUser();
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch cars");
+    if (!user) {
+      window.location.href = "/login.html";
+      return;
     }
 
-    const cars = await response.json();
-    const list = document.getElementById("cars");
+    if (user.role !== "driver") {
+      window.location.href = "/profile.html";
+      return;
+    }
 
-    list.innerHTML = "";
-
-    cars.forEach((car) => {
-      const li = document.createElement("li");
-
-      li.textContent =
-        `${car.year} ${car.make} ${car.model} ` +
-        `(${car.color ?? "unknown color"}) - ` +
-        `Plate: ${car.license_plate}, ` +
-        `Seats: ${car.passenger_capacity}, ` +
-        `Fuel: ${car.fuel_type ?? "unknown"}, ` +
-        `Efficiency: ${car.fuel_efficiency ?? "unknown"}`;
-
-      list.appendChild(li);
-    });
+    carsPage.style.display = "block";
+    await loadCars();
   } catch (err) {
     console.error("Error loading cars:", err);
   }
@@ -52,11 +80,11 @@ document.getElementById('add_car_form').addEventListener('submit', async functio
       window.location.href = '../dashboard.html'; // Redirect to dashboard or desired page
     } else {
       // Error: show error message
-      document.getElementById('error_message').textContent = result.error || 'Could not add car';
-      document.getElementById('error_message').style.display = 'block';
+      errorMessage.textContent = result.error || 'Could not add car';
+      errorMessage.style.display = 'block';
     }
   } catch (err) {
-    document.getElementById('error_message').textContent = 'Network error';
-    document.getElementById('error_message').style.display = 'block';
+    errorMessage.textContent = 'Network error';
+    errorMessage.style.display = 'block';
   }
 }); 
