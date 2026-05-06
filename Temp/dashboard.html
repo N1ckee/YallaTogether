@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - Yala Together</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+  
+  <header class="header">
+  <div class="logo-wrapper">
+    <img src="images/yalla-together.svg" alt="Yalla Together!" class="logo">
+  </div>
+</header>
+<body>
+
+<div class="dashboard-container">
+
+  <div class="top-bar">
+    <button id="logoutBtn">Log out</button>
+  </div>
+  <div class="userinfo">
+        <p id="username" value="null"></p>
+        <p id="role" value="null"></p>
+  </div>
+<form id="driverForm" style="display:none;">
+  <h3>Add Ride</h3>
+
+  <input type="text" id="driverFrom" placeholder="From">
+  <input type="text" id="driverTo" placeholder="To">
+  <input type="time" id="driverTime">
+  <input type="number" id="driverSeats" placeholder="Seats">
+  <button id="addRideBtn">Add Ride</button>
+</form>
+  <h2 id="welcomeText"></h2>
+
+  <div class="ride-controls">
+    <input type="text" id="fromInput" placeholder="From">
+    <input type="text" id="toInput" placeholder="To">
+    <button id="useLocationBtn">Use Current Location</button>
+  </div>
+
+  <div id="map"></div>
+  <div id="ridesContainer"></div>
+  <div id="distanceInfo" class="distance-box"></div>
+
+  <div id="contentArea"></div>
+
+</div>
+
+<script src="dashboard.js"></script>
+
+</body>
+</html>

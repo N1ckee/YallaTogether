@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dashboard</title>
     <link href="css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="js/dashboard.js" defer></script>
   </head>
   <body>
@@ -15,6 +17,7 @@
       <a href="profile.html"><i>edit profile</i></a>
     </div>
     <div class="ride-container">
+      <button type="button" id="mode_toggle_btn" style="display: none;">Switch to Driver Mode</button>
       <section id="create_ride_section" style="display: none;">
         <h2>Create Ride</h2>
         <form id="create_ride_form">
@@ -36,20 +39,28 @@
           <input type="datetime-local" id="arrival_time" name="arrival_time" required>
           <br>
           <label for="distance">Distance (km):</label>
-          <input type="number" id="distance" name="distance" step="0.1" min="0" required>
+          <input type="number" id="distance" name="distance" step="0.1" min="0" readonly>
           <br>
           <label for="estimated_time">Estimated Time (minutes):</label>
-          <input type="number" id="estimated_time" name="estimated_time" step="1" min="0" required>
+          <input type="number" id="estimated_time" name="estimated_time" step="1" min="0" readonly>
+          <br>
+          <label for="available_seats">Available Seats:</label>
+          <input type="number" id="available_seats" name="available_seats" min="1" required>
           <br>
           <label for="stops">Stops:</label>
           <textarea id="stops" name="stops" rows="3" placeholder="One stop per line"></textarea>
+          <p id="distanceInfo" class="distance-box">Select start and arrival points on the map.</p>
           <p style="color: red; display: none;" id="ride_error_message">Error</p>
           <p style="color: green; display: none;" id="ride_success_message">Success</p>
           <button type="submit">Create Ride</button>
         </form>
       </section>
 
-      <input type="text" id="ride-search" placeholder="Search for rides...">
+      <div class="ride-controls">
+        <input type="text" id="ride-search" placeholder="Search arrival point...">
+        <button type="button" id="useLocationBtn">Use Current Location</button>
+      </div>
+      <h2 id="ride_list_title">Rides</h2>
       <div id="ride-list">
       </div>
     </div>

@@ -22,18 +22,30 @@ router.post("/create", verify, async (req, res) => {
     departure_time,
     distance,
     estimated_time,
+    available_seats,
+    start_lat,
+    start_lng,
+    end_lat,
+    end_lng,
     stops
   } = req.body;
 
-  if (
-    !car_id ||
-    !start_location ||
-    !end_location ||
-    !arrival_time ||
-    !departure_time ||
-    !distance ||
-    !estimated_time
-  ) {
+  const requiredFields = [
+    car_id,
+    start_location,
+    end_location,
+    arrival_time,
+    departure_time,
+    distance,
+    estimated_time,
+    available_seats,
+    start_lat,
+    start_lng,
+    end_lat,
+    end_lng
+  ];
+
+  if (requiredFields.some((field) => field === undefined || field === null || field === "")) {
     return res.status(400).json({ error: "Missing required ride fields." });
   }
 
@@ -71,10 +83,15 @@ router.post("/create", verify, async (req, res) => {
           departure_time,
           distance,
           estimated_time,
+          available_seats,
+          start_lat,
+          start_lng,
+          end_lat,
+          end_lng,
           stops
         )
        VALUES
-        ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
        RETURNING *`,
       [
         driverId,
@@ -85,6 +102,11 @@ router.post("/create", verify, async (req, res) => {
         departure_time,
         distance,
         estimated_time,
+        available_seats,
+        start_lat,
+        start_lng,
+        end_lat,
+        end_lng,
         JSON.stringify(normalizedStops)
       ]
     );
@@ -93,6 +115,43 @@ router.post("/create", verify, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Could not create ride." });
+  }
+});
+
+router.get("/all", verify, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT
+        p.path_id,
+        p.driver_id,
+        p.car_id,
+        p.start_location,
+        p.end_location,
+        p.arrival_time,
+        p.departure_time,
+        p.distance,
+        p.estimated_time,
+        p.available_seats,
+        p.start_lat,
+        p.start_lng,
+        p.end_lat,
+        p.end_lng,
+        p.stops,
+        u.username AS driver_username,
+        c.make,
+        c.model,
+        c.license_plate
+       FROM paths p
+       JOIN drivers d ON d.driver_id = p.driver_id
+       JOIN users u ON u.user_id = d.user_id
+       JOIN cars c ON c.car_id = p.car_id
+       ORDER BY p.departure_time ASC`
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Could not load rides." });
   }
 });
 
