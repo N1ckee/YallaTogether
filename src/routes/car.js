@@ -1,28 +1,24 @@
 import { Router } from "express";
 import { pool } from "../db/client.js";
-import jwt from "jsonwebtoken";
+import verify from "../middleware/verify.js";
 
 const router = Router();
 
-router.get('/get', async (req, res) => {
+router.get("/get", verify, async (req, res) => {
   try {
-    // Ensure user is authenticated and verified
-    if (!req.user || !req.user.verified) {
-      return res.status(403).json({ error: 'User not verified' });
-    }
-
-    // Fetch cars belonging to the authenticated user
     const result = await pool.query(
-      'SELECT * FROM cars WHERE user_id = $1',
-      [req.user.id]
+      "SELECT * FROM cars WHERE user_id = $1",
+      [req.user.user_id]
     );
+
     res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ error: 'Database error' });
+    console.error(err);
+    res.status(500).json({ error: "Database error" });
   }
 });
 
-router.post('/add', async (req, res) => {
+router.post("/add", verify, async (req, res) => {
   const {
     make,
     model,
@@ -35,22 +31,40 @@ router.post('/add', async (req, res) => {
   } = req.body;
 
   try {
-    // Ensure user is authenticated and verified
-    if (!req.user || !req.user.verified) {
-      return res.status(403).json({ error: 'user not verified' });
-    }
-
-    const car_result = await pool.query(
-      'INSERT INTO cars (make, model, year, color, passenger_capacity, license_plate, fuel_type, fuel_efficiency, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
-      [make, model, year, color, passenger_capacity, license_plate, fuel_type, fuel_efficiency, req.user.id]
+    const carResult = await pool.query(
+      `INSERT INTO cars
+      (
+        make,
+        model,
+        year,
+        color,
+        passenger_capacity,
+        license_plate,
+        fuel_type,
+        fuel_efficiency,
+        user_id
+      )
+      VALUES
+      ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING *`,
+      [
+        make,
+        model,
+        year,
+        color,
+        passenger_capacity,
+        license_plate,
+        fuel_type,
+        fuel_efficiency,
+        req.user.user_id,
+      ]
     );
-    res.json(car_result.rows[0]);;
 
+    res.json(carResult.rows[0]);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Database error' });
+    res.status(500).json({ error: "Database error" });
   }
-
 });
 
 export default router;

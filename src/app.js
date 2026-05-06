@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import auth_routes from "./routes/auth.js"
 import user_routes from "./routes/user.js"
 import car_routes from "./routes/car.js"
@@ -10,6 +11,7 @@ const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 app.use(express.json());
+app.use(cookieParser());
 app.use("/auth", auth_routes);
 app.use("/users", user_routes);
 app.use("/cars", car_routes);
