@@ -27,7 +27,7 @@ router.post("/create", verify, async (req, res) => {
     start_lng,
     end_lat,
     end_lng,
-    stops
+    path_data
   } = req.body;
 
   const requiredFields = [
@@ -42,11 +42,16 @@ router.post("/create", verify, async (req, res) => {
     start_lat,
     start_lng,
     end_lat,
-    end_lng
+    end_lng,
+    path_data
   ];
 
   if (requiredFields.some((field) => field === undefined || field === null || field === "")) {
     return res.status(400).json({ error: "Missing required ride fields." });
+  }
+
+  if (!Array.isArray(path_data) || path_data.length === 0) {
+    return res.status(400).json({ error: "Route path data is required." });
   }
 
   try {
@@ -65,13 +70,6 @@ router.post("/create", verify, async (req, res) => {
       return res.status(400).json({ error: "Selected car does not belong to this driver." });
     }
 
-    const normalizedStops = Array.isArray(stops)
-      ? stops
-      : String(stops || "")
-        .split("\n")
-        .map((stop) => stop.trim())
-        .filter(Boolean);
-
     const result = await pool.query(
       `INSERT INTO paths
         (
@@ -88,10 +86,11 @@ router.post("/create", verify, async (req, res) => {
           start_lng,
           end_lat,
           end_lng,
+          path_data,
           stops
         )
        VALUES
-        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
        RETURNING *`,
       [
         driverId,
@@ -107,7 +106,8 @@ router.post("/create", verify, async (req, res) => {
         start_lng,
         end_lat,
         end_lng,
-        JSON.stringify(normalizedStops)
+        JSON.stringify(path_data),
+        JSON.stringify([])
       ]
     );
 
@@ -136,6 +136,7 @@ router.get("/all", verify, async (req, res) => {
         p.start_lng,
         p.end_lat,
         p.end_lng,
+        p.path_data,
         p.stops,
         u.username AS driver_username,
         c.make,

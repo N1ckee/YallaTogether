@@ -20,6 +20,9 @@ let map = null;
 let startMarker = null;
 let endMarker = null;
 let routeLine = null;
+let currentRoutePath = [];
+let currentRouteDistanceKm = 0;
+let currentRouteEtaMinutes = 0;
 let rideMarkers = [];
 let searchTimer = null;
 let startInputTimer = null;
@@ -159,10 +162,10 @@ function setStartMarker(latlng) {
 
   startMarker = L.marker(latlng, { icon: greenIcon, draggable: true }).addTo(map);
   startMarker.on("dragend", () => {
-    drawRoute();
+    updateRoute();
     updateLocationInputFromMarker("start");
   });
-  drawRoute();
+  updateRoute();
 }
 
 function setEndMarker(latlng) {
@@ -172,10 +175,10 @@ function setEndMarker(latlng) {
 
   endMarker = L.marker(latlng, { icon: redIcon, draggable: true }).addTo(map);
   endMarker.on("dragend", () => {
-    drawRoute();
+    updateRoute();
     updateLocationInputFromMarker("end");
   });
-  drawRoute();
+  updateRoute();
 }
 
 async function updateLocationInputFromMarker(type) {
@@ -224,29 +227,99 @@ async function updateMarkerFromLocationInput(type) {
   map.setView(latlng, 12);
 }
 
-function drawRoute() {
+function formatDuration(totalMinutes) {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours > 0) {
+    return `${hours} h ${minutes} min`;
+  }
+
+  return `${minutes} min`;
+}
+
+async function fetchRoutePath(start, end) {
+  const url =
+    `https://router.project-osrm.org/route/v1/driving/` +
+    `${start.lng},${start.lat};${end.lng},${end.lat}` +
+    `?overview=full&geometries=geojson`;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const result = await response.json();
+  const route = result.routes?.[0];
+
+  if (!route) {
+    return null;
+  }
+
+  return route.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+}
+
+async function updateRoute() {
   if (routeLine) {
     map.removeLayer(routeLine);
     routeLine = null;
   }
 
   if (!startMarker || !endMarker) {
+    currentRoutePath = [];
+    currentRouteDistanceKm = 0;
+    currentRouteEtaMinutes = 0;
     distanceInfo.textContent = "Select start and arrival points on the map.";
     return;
   }
 
   const start = startMarker.getLatLng();
   const end = endMarker.getLatLng();
+  const routedPath = await fetchRoutePath(start, end);
 
-  routeLine = L.polyline([start, end], {
+  if (!routedPath) {
+    currentRoutePath = [];
+    currentRouteDistanceKm = 0;
+    currentRouteEtaMinutes = 0;
+    distanceInfo.textContent = "Could not calculate a road route between these points.";
+    return;
+  }
+
+  routeLine = L.polyline(routedPath, {
     color: "#2563eb",
     weight: 5
   }).addTo(map);
 
-  const distance = calculateDistance(start.lat, start.lng, end.lat, end.lng);
-  distanceInfo.textContent = `Distance: ${distance.toFixed(2)} km`;
-  document.getElementById("distance").value = distance.toFixed(2);
-  document.getElementById("estimated_time").value = Math.max(1, Math.round(distance / 60 * 60));
+  currentRoutePath = routedPath;
+  currentRouteDistanceKm = calculatePathDistance(routedPath);
+  currentRouteEtaMinutes = Math.max(1, Math.round(currentRouteDistanceKm / 40 * 60));
+
+  distanceInfo.textContent =
+    `Distance: ${currentRouteDistanceKm.toFixed(2)} km | ETA: ${formatDuration(currentRouteEtaMinutes)}`;
+  document.getElementById("distance").value = currentRouteDistanceKm.toFixed(2);
+  document.getElementById("estimated_time").value = currentRouteEtaMinutes;
+}
+
+function calculatePathDistance(path) {
+  let distance = 0;
+
+  for (let i = 1; i < path.length; i += 1) {
+    distance += calculateDistance(path[i - 1][0], path[i - 1][1], path[i][0], path[i][1]);
+  }
+
+  return distance;
+}
+
+function calculateArrivalTime(departureTime, durationMinutes) {
+  const departure = new Date(departureTime);
+
+  if (Number.isNaN(departure.getTime())) {
+    return "";
+  }
+
+  departure.setMinutes(departure.getMinutes() + durationMinutes);
+  return departure.toISOString();
 }
 
 function clearRideMarkers() {
@@ -454,6 +527,14 @@ function setupCreateRideLocationInputs() {
   });
 }
 
+function setupCarSelectRedirect() {
+  carSelect.addEventListener("change", () => {
+    if (carSelect.value === "__add_car__") {
+      window.location.href = "/cars.html";
+    }
+  });
+}
+
 async function fillMissingCreateRideCoordinates(data) {
   if (!startMarker) {
     const start = await geocodeLocation(data.start_location);
@@ -475,6 +556,7 @@ async function setupDashboard() {
   setupSearch();
   setupCurrentLocationButton();
   setupCreateRideLocationInputs();
+  setupCarSelectRedirect();
   setupModeToggle();
 
   currentUser = await loadCurrentUser();
@@ -511,15 +593,24 @@ createRideForm.addEventListener("submit", async function (e) {
     return;
   }
 
+  await updateRoute();
+
+  if (!currentRoutePath.length) {
+    showMessage(rideErrorMessage, "Could not calculate a road route for this ride.");
+    return;
+  }
+
   const start = startMarker.getLatLng();
   const end = endMarker.getLatLng();
-  const distance = calculateDistance(start.lat, start.lng, end.lat, end.lng);
 
-  data.distance = distance.toFixed(2);
+  data.distance = currentRouteDistanceKm.toFixed(2);
+  data.estimated_time = currentRouteEtaMinutes;
+  data.arrival_time = calculateArrivalTime(data.departure_time, currentRouteEtaMinutes);
   data.start_lat = start.lat;
   data.start_lng = start.lng;
   data.end_lat = end.lat;
   data.end_lng = end.lng;
+  data.path_data = currentRoutePath;
 
   try {
     const response = await fetch("/paths/create", {

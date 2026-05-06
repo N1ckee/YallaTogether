@@ -13,6 +13,7 @@ CREATE TABLE paths (
   start_lng FLOAT NOT NULL,
   end_lat FLOAT NOT NULL,
   end_lng FLOAT NOT NULL,
+  path_data JSONB NOT NULL,
   stops JSONB,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (driver_id) REFERENCES drivers(driver_id) ON DELETE CASCADE,
