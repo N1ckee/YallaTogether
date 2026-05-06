@@ -4,11 +4,26 @@ import verify from "../middleware/verify.js";
 
 const router = Router();
 
+async function getDriverId(userId) {
+  const result = await pool.query(
+    "SELECT driver_id FROM drivers WHERE user_id = $1",
+    [userId]
+  );
+
+  return result.rows[0]?.driver_id;
+}
+
 router.get("/get", verify, async (req, res) => {
   try {
+    const driverId = await getDriverId(req.user.user_id);
+
+    if (!driverId) {
+      return res.status(403).json({ error: "Only registered drivers can manage cars" });
+    }
+
     const result = await pool.query(
-      "SELECT * FROM cars WHERE user_id = $1",
-      [req.user.user_id]
+      "SELECT * FROM cars WHERE driver_id = $1 ORDER BY car_id",
+      [driverId]
     );
 
     res.json(result.rows);
@@ -31,9 +46,16 @@ router.post("/add", verify, async (req, res) => {
   } = req.body;
 
   try {
+    const driverId = await getDriverId(req.user.user_id);
+
+    if (!driverId) {
+      return res.status(403).json({ error: "Only registered drivers can add cars" });
+    }
+
     const carResult = await pool.query(
       `INSERT INTO cars
       (
+        driver_id,
         make,
         model,
         year,
@@ -41,13 +63,13 @@ router.post("/add", verify, async (req, res) => {
         passenger_capacity,
         license_plate,
         fuel_type,
-        fuel_efficiency,
-        user_id
+        fuel_efficiency
       )
       VALUES
       ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *`,
       [
+        driverId,
         make,
         model,
         year,
@@ -56,7 +78,6 @@ router.post("/add", verify, async (req, res) => {
         license_plate,
         fuel_type,
         fuel_efficiency,
-        req.user.user_id,
       ]
     );
 
@@ -68,4 +89,3 @@ router.post("/add", verify, async (req, res) => {
 });
 
 export default router;
-

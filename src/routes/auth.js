@@ -29,32 +29,62 @@ router.post('/register', async (req, res) => {
     license_number
   } = req.body;
 
-  console.log("Received registration data:", req.body);
+  const normalizedRole = role === "driver" ? "driver" : "user";
 
-  const password_hash = await bcrypt.hash(password, 10);
+  if (!first_name || !last_name || !username || !email || !password) {
+    return res.status(400).json({ error: "Missing required registration fields." });
+  }
+
+  if (normalizedRole === "driver" && !license_number) {
+    return res.status(400).json({ error: "License number is required for drivers." });
+  }
+
+  let client;
   try {
-    // insert into users table
-    const userResult = await pool.query(
-      'insert into users (first_name, last_name, username, email, phone_number, password_hash, role, user_rating, icon_url) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning user_id',
-      [first_name, last_name, username, email, phone_number, password_hash, role || "user", user_rating || 0, icon_url || null]
+    client = await pool.connect();
+    await client.query("BEGIN");
+
+    const password_hash = await bcrypt.hash(password, 10);
+    const userResult = await client.query(
+      `INSERT INTO users
+        (first_name, last_name, username, email, phone_number, password_hash, role, user_rating, icon_url)
+       VALUES
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       RETURNING user_id`,
+      [
+        first_name,
+        last_name,
+        username,
+        email,
+        phone_number || null,
+        password_hash,
+        normalizedRole,
+        user_rating || 0,
+        icon_url || null
+      ]
     );
     const user_id = userResult.rows[0].user_id;
 
-    // If registering as driver, insert into drivers table
-    if (role === 'driver') {
-      if (!license_number) {
-        return res.status(400).json({ error: 'Missing required driver fields.' });
-      }
-      await pool.query(
-        'INSERT INTO drivers (user_id, driver_rating, license_number) VALUES ($1, $2, $3)',
-        [user_id, driver_rating || 0, license_number]
+    if (normalizedRole === "driver") {
+      await client.query(
+        "INSERT INTO drivers (user_id, driver_rating, license_number) VALUES ($1, $2, $3)",
+        [user_id, 0, license_number]
       );
     }
 
-    res.status(201).json({ message: 'Registration successful.' });
+    await client.query("COMMIT");
+    res.status(201).json({ message: "Registration successful." });
   } catch (err) {
+    if (client) {
+      await client.query("ROLLBACK");
+    }
     console.error(err);
-    res.status(500).json({ error: 'Registration failed.' });
+    if (err.code === "23505") {
+      return res.status(409).json({ error: "Username, email, or license number already exists." });
+    }
+    res.status(500).json({ error: "Registration failed." });
+  } finally {
+    client?.release();
   }
 });
 

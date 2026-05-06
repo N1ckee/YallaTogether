@@ -15,7 +15,7 @@ window.addEventListener("load", async () => {
     list.innerHTML = "";
 
     cars.forEach((car) => {
-      const li = document.createElement("car_list");
+      const li = document.createElement("li");
 
       li.textContent =
         `${car.year} ${car.make} ${car.model} ` +
@@ -52,7 +52,7 @@ document.getElementById('add_car_form').addEventListener('submit', async functio
       window.location.href = '../dashboard.html'; // Redirect to dashboard or desired page
     } else {
       // Error: show error message
-      document.getElementById('error_message').textContent = result.error || 'Login failed';
+      document.getElementById('error_message').textContent = result.error || 'Could not add car';
       document.getElementById('error_message').style.display = 'block';
     }
   } catch (err) {

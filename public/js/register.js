@@ -27,7 +27,7 @@ document.getElementById('register_form').addEventListener('submit', async functi
     const result = await response.json();
     if (response.ok) {
       // Success: handle accordingly (e.g., redirect or show message)
-      window.location.href = '/login';
+      window.location.href = '/login.html';
     } else {
       // Error: show error message
       document.getElementById('error_message').textContent = result.error || 'Registration failed';
@@ -38,4 +38,3 @@ document.getElementById('register_form').addEventListener('submit', async functi
     document.getElementById('error_message').style.display = 'block';
   }
 });
-
