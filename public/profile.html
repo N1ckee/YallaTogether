@@ -5,9 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Profile</title>
     <link href="css/style.css" rel="stylesheet">
+    <script src="js/profile.js" defer></script>
   </head>
   <body>
-    <a href="dashboard.html">Back to Dashboard</a>
-    <a href="cars.html">My Cars</a>
+    <main id="profilePage">
+      <nav>
+        <a href="dashboard.html">Back to Dashboard</a>
+        <a href="cars.html">My Cars</a>
+      </nav>
+
+      <section>
+        <h1>Profile</h1>
+        <form id="become_driver_form">
+          <h2>Register as a driver</h2>
+          <label for="license_number">License Number:</label>
+          <input type="text" id="license_number" name="license_number" required>
+          <p style="color: red; display: none;" id="driver_error_message">Error</p>
+          <p style="color: green; display: none;" id="driver_success_message">Success</p>
+          <button type="submit">Register as Driver</button>
+        </form>
+      </section>
+    </main>
   </body>
 </html>
