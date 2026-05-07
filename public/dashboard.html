@@ -10,14 +10,18 @@
     <script src="js/dashboard.js" defer></script>
   </head>
   <body>
-    <div class="profile-container">
+    <div class="dashboard-page">
+    <div class="dashboard-sidebar">
+  <div class="profile-container">
       <img src="images/yalla-together.svg" alt="Profile Picture" class="profile-picture">
       <p><strong><span id="username">Username</span></strong></p>
       <p>rating: <span id="rating">0</span>/5</p>
       <a href="profile.html"><i>edit profile</i></a>
       <button type="button" id="logoutBtn">Log out</button>
     </div>
-    <div class="ride-container">
+      </div>
+    <div class="dashboard-content">
+  <div class="ride-container">
       <button type="button" id="mode_toggle_btn" style="display: none;">Switch to Driver Mode</button>
       <section id="create_ride_section" style="display: none;">
         <h2>Create Ride</h2>
@@ -49,7 +53,7 @@
           <button type="submit">Create Ride</button>
         </form>
       </section>
-
+    
       <div class="ride-controls">
         <input type="text" id="ride-search" placeholder="Search arrival point...">
         <button type="button" id="useLocationBtn">Use Current Location</button>
@@ -59,9 +63,12 @@
       <h2 id="ride_list_title">Rides</h2>
       <div id="ride-list">
       </div>
+
     </div>
+      </div>
     <div class="map-container">
       <div id="map"></div>
     </div>
+      </div>
   </body>
 </html>
