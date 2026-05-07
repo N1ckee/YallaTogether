@@ -1,9 +1,41 @@
-<section class="about-section">
+<!DOCTYPE html>
+<html lang="en">
 
-  <div class="about-container">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About | YallaTogether</title>
 
-    <div class="about-text">
-      <h2>About Yalla Together</h2>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="header">
+
+    <div class="logo-wrapper">
+      <img src="/images/yalla-together.svg" class="logo" alt="logo">
+    </div>
+
+    <nav>
+      <a href="startpage.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="support.html">Support</a>
+      <a href="terms-condition.html">Terms</a>
+    </nav>
+
+  </header>
+
+  <!-- Title -->
+  <h1 class="about-title reveal">
+    About Yalla Together
+  </h1>
+
+  <!-- About Section -->
+  <section class="about-section">
+
+    <div class="about-text reveal">
 
       <p>
         Yalla Together is a ride-sharing platform designed to connect
@@ -19,72 +51,81 @@
         Drivers can share available seats in their cars while passengers
         can easily find affordable rides.
       </p>
+
     </div>
 
-    <div class="about-image">
-      <img src="images/yalla3.png" alt="About us">
+    <div class="about-image reveal reveal-image">
+      <img src="/images/yalla3.png" alt="About us">
     </div>
 
-  </div>
+  </section>
 
-  <div class="features-grid">
+  <!-- Features -->
+  <section class="features">
 
-    <div class="feature-card">
-      <h3>🚗 Easy Rides</h3>
-      <p>
-        Quickly find drivers or passengers going the same way.
-      </p>
+    <div class="features-grid">
+
+      <div class="feature reveal">
+        <h3>🚗 Easy Rides</h3>
+
+        <p>
+          Quickly find drivers or passengers going the same way.
+        </p>
+      </div>
+
+      <div class="feature reveal">
+        <h3>🔒 Safe Trips</h3>
+
+        <p>
+          Travel with verified users and trusted community members.
+        </p>
+      </div>
+
+      <div class="feature reveal">
+        <h3>💰 Affordable</h3>
+
+        <p>
+          Share costs and travel cheaper than traditional transport.
+        </p>
+      </div>
+
+      <div class="feature reveal">
+        <h3>⚡ Fast Booking</h3>
+
+        <p>
+          Book your ride within seconds.
+        </p>
+      </div>
+
     </div>
 
-    <div class="feature-card">
-      <h3>🔒 Safe Trips</h3>
-      <p>
-        Travel with verified users and trusted community members.
-      </p>
-    </div>
+  </section>
 
-    <div class="feature-card">
-      <h3>💰 Affordable</h3>
-      <p>
-        Share costs and travel cheaper than traditional transport.
-      </p>
-    </div>
+  <!-- Footer -->
+  <footer class="footer">
 
-    <div class="feature-card">
-      <h3>⚡ Fast Booking</h3>
-      <p>
-        Book your ride within seconds.
-      </p>
-    </div>
+    <a href="startpage.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="support.html">Support</a>
+    <a href="terms-condition.html">Terms</a>
 
-  </div>
+  </footer>
 
-</section>
+  <script>
+    const reveals = document.querySelectorAll(".reveal");
 
-<footer class="footer">
+    window.addEventListener("scroll", () => {
+      reveals.forEach((element) => {
+        const windowHeight = window.innerHeight;
+        const revealTop = element.getBoundingClientRect().top;
 
-  <div class="footer-container">
+        if (revealTop < windowHeight - 100) {
+          element.classList.add("show");
+        }
+      });
+    });
+  </script>
 
-    <div class="footer-logo">
-      <h2>YallaTogether</h2>
-      <p>
-        Making travel easier, cheaper, and more social.
-      </p>
-    </div>
+</body>
 
-    <div class="footer-links">
-      <h3>Links</h3>
-
-      <a href="startpage.html">Home</a>
-      <a href="about.html">About</a>
-      <a href="terms-condition.html.html">terms-condition</a>
-      <a href="support.html">Support</a>
-    </div>
-
-    
-
-  <div class="footer-bottom">
-    <p>© 2026 YallaTogether. All rights reserved.</p>
-  </div>
-
-</footer>
+</html>
