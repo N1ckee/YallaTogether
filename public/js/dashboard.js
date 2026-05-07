@@ -15,6 +15,7 @@ const distanceInfo = document.getElementById("distanceInfo");
 const useLocationBtn = document.getElementById("useLocationBtn");
 const bookRideBtn = document.getElementById("bookRideBtn");
 const bookingMessage = document.getElementById("booking_message");
+const logoutBtn = document.getElementById("logoutBtn");
 
 let currentUser = null;
 let allRides = [];
@@ -633,6 +634,16 @@ function setupModeToggle() {
   });
 }
 
+function setupLogoutButton() {
+  logoutBtn.addEventListener("click", async () => {
+    try {
+      await fetch("/auth/logout", { method: "POST" });
+    } finally {
+      window.location.href = "/login.html";
+    }
+  });
+}
+
 function setupCurrentLocationButton() {
   useLocationBtn.addEventListener("click", () => {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -771,6 +782,7 @@ async function setupDashboard() {
   setupSearch();
   setupCurrentLocationButton();
   setupBookRideButton();
+  setupLogoutButton();
   setupCreateRideLocationInputs();
   setupCarSelectRedirect();
   setupModeToggle();
