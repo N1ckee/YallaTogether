@@ -787,6 +787,25 @@ margin-top:30px;
   flex-direction: column;
   gap: 10px;
 }
+
+.booking-message {
+  margin: 0;
+  font-weight: 600;
+}
+
+.booking-message.error {
+  color: #b91c1c;
+}
+
+.booking-message.success {
+  color: #15803d;
+}
+
+#bookRideBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 /* 🚗 Ride Card */
 .ride-card {
   background: white;
@@ -796,12 +815,23 @@ margin-top:30px;
   box-shadow: 0 8px 25px rgba(0,0,0,0.08);
   transition: all 0.3s ease;
   border-left: 5px solid #2563eb;
+  cursor: pointer;
 }
 
 /* ✨ حركة عند المرور */
 .ride-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.ride-card:focus {
+  outline: 3px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 2px;
+}
+
+.ride-card.selected {
+  border-left-color: #16a34a;
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.18);
 }
 
 /* 📝 عنوان الرحلة */

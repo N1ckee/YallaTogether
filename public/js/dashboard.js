@@ -13,13 +13,18 @@ const rideErrorMessage = document.getElementById("ride_error_message");
 const rideSuccessMessage = document.getElementById("ride_success_message");
 const distanceInfo = document.getElementById("distanceInfo");
 const useLocationBtn = document.getElementById("useLocationBtn");
+const bookRideBtn = document.getElementById("bookRideBtn");
+const bookingMessage = document.getElementById("booking_message");
 
 let currentUser = null;
 let allRides = [];
 let map = null;
 let startMarker = null;
 let endMarker = null;
+let userLocationMarker = null;
 let routeLine = null;
+let selectedRideId = null;
+let selectedRide = null;
 let currentRoutePath = [];
 let currentRouteDistanceKm = 0;
 let currentRouteEtaMinutes = 0;
@@ -42,6 +47,13 @@ const greenIcon = new L.Icon({
 
 const redIcon = new L.Icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
+});
+
+const blueIcon = new L.Icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41]
@@ -117,6 +129,16 @@ function showMessage(element, message) {
   element.style.display = "block";
 }
 
+function showBookingMessage(message, type = "error") {
+  bookingMessage.textContent = message;
+  bookingMessage.className = `booking-message ${type}`;
+  bookingMessage.style.display = "block";
+}
+
+function hideBookingMessage() {
+  bookingMessage.style.display = "none";
+}
+
 function hideRideMessages() {
   rideErrorMessage.style.display = "none";
   rideSuccessMessage.style.display = "none";
@@ -144,6 +166,11 @@ function initMap() {
   }).addTo(map);
 
   map.on("click", (e) => {
+    if (dashboardMode !== "driver") {
+      setUserLocationMarker(e.latlng);
+      return;
+    }
+
     if (!startMarker) {
       setStartMarker(e.latlng);
       updateLocationInputFromMarker("start");
@@ -153,6 +180,16 @@ function initMap() {
     setEndMarker(e.latlng);
     updateLocationInputFromMarker("end");
   });
+}
+
+function setUserLocationMarker(latlng) {
+  if (userLocationMarker) {
+    map.removeLayer(userLocationMarker);
+  }
+
+  userLocationMarker = L.marker(latlng, { icon: blueIcon, draggable: true })
+    .addTo(map)
+    .bindPopup("Your location");
 }
 
 function setStartMarker(latlng) {
@@ -301,6 +338,17 @@ async function updateRoute() {
   document.getElementById("estimated_time").value = currentRouteEtaMinutes;
 }
 
+function clearDisplayedRoute() {
+  if (routeLine) {
+    map.removeLayer(routeLine);
+    routeLine = null;
+  }
+
+  currentRoutePath = [];
+  currentRouteDistanceKm = 0;
+  currentRouteEtaMinutes = 0;
+}
+
 function calculatePathDistance(path) {
   let distance = 0;
 
@@ -351,6 +399,76 @@ function formatDateTime(value) {
   return new Date(value).toLocaleString();
 }
 
+function parseRidePath(pathData) {
+  if (Array.isArray(pathData)) {
+    return pathData;
+  }
+
+  if (typeof pathData !== "string") {
+    return [];
+  }
+
+  try {
+    const parsedPath = JSON.parse(pathData);
+    return Array.isArray(parsedPath) ? parsedPath : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+function clearCreationMarkers() {
+  if (startMarker) {
+    map.removeLayer(startMarker);
+    startMarker = null;
+  }
+
+  if (endMarker) {
+    map.removeLayer(endMarker);
+    endMarker = null;
+  }
+}
+
+function loadRidePath(ride, ridesToRender = getVisibleRides()) {
+  selectedRideId = ride.path_id;
+  selectedRide = ride;
+  hideBookingMessage();
+  clearDisplayedRoute();
+  clearCreationMarkers();
+
+  const path = parseRidePath(ride.path_data);
+
+  if (path.length > 0) {
+    routeLine = L.polyline(path, {
+      color: "#2563eb",
+      weight: 5
+    }).addTo(map);
+    map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
+  } else if (ride.start_lat && ride.start_lng && ride.end_lat && ride.end_lng) {
+    routeLine = L.polyline(
+      [
+        [ride.start_lat, ride.start_lng],
+        [ride.end_lat, ride.end_lng]
+      ],
+      {
+        color: "#2563eb",
+        weight: 5,
+        dashArray: "8 8"
+      }
+    ).addTo(map);
+    map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
+  }
+
+  startMarker = L.marker([ride.start_lat, ride.start_lng], { icon: greenIcon })
+    .addTo(map)
+    .bindPopup(`Start: ${ride.start_location}`);
+  endMarker = L.marker([ride.end_lat, ride.end_lng], { icon: redIcon })
+    .addTo(map)
+    .bindPopup(`Destination: ${ride.end_location}`);
+
+  displayRides(ridesToRender);
+  updateBookButtonState();
+}
+
 function displayRides(rides) {
   rideList.innerHTML = "";
 
@@ -363,6 +481,13 @@ function displayRides(rides) {
   rides.forEach((ride) => {
     const div = document.createElement("div");
     div.classList.add("ride-card");
+    div.tabIndex = 0;
+    div.setAttribute("role", "button");
+    div.setAttribute("aria-label", `Load ride from ${ride.start_location} to ${ride.end_location}`);
+
+    if (ride.path_id === selectedRideId) {
+      div.classList.add("selected");
+    }
 
     const nearestText = ride.search_distance_km !== undefined
       ? `<p>Distance to searched arrival: ${ride.search_distance_km.toFixed(2)} km</p>`
@@ -379,13 +504,21 @@ function displayRides(rides) {
       ${nearestText}
     `;
 
+    div.addEventListener("click", () => loadRidePath(ride, rides));
+    div.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        loadRidePath(ride, rides);
+      }
+    });
+
     rideList.appendChild(div);
   });
 
   addRideMarkers(rides);
 }
 
-function getModeRides() {
+function getVisibleRides() {
   if (dashboardMode !== "driver") {
     return allRides;
   }
@@ -396,7 +529,7 @@ function getModeRides() {
 function textFilterRides(query) {
   const normalizedQuery = query.toLowerCase();
 
-  return getModeRides().filter((ride) => (
+  return getVisibleRides().filter((ride) => (
     ride.start_location.toLowerCase().includes(normalizedQuery) ||
     ride.end_location.toLowerCase().includes(normalizedQuery)
   ));
@@ -410,14 +543,14 @@ function renderCurrentRideList() {
     return;
   }
 
-  displayRides(getModeRides());
+  displayRides(getVisibleRides());
 }
 
 async function searchRides() {
   const query = rideSearch.value.trim();
 
   if (!query) {
-    displayRides(getModeRides());
+    displayRides(getVisibleRides());
     return;
   }
 
@@ -428,7 +561,7 @@ async function searchRides() {
     return;
   }
 
-  const sorted = getModeRides()
+  const sorted = getVisibleRides()
     .filter((ride) => ride.end_lat && ride.end_lng)
     .map((ride) => ({
       ...ride,
@@ -471,19 +604,27 @@ async function loadCreateRideCars() {
 async function setDashboardMode(mode) {
   dashboardMode = mode;
   rideSearch.value = "";
+  selectedRideId = null;
+  selectedRide = null;
+  clearDisplayedRoute();
+  hideBookingMessage();
 
   if (dashboardMode === "driver") {
     createRideSection.style.display = "block";
     modeToggleBtn.textContent = "Switch to User Mode";
     rideListTitle.textContent = "Your Rides";
+    bookRideBtn.style.display = "none";
     await loadCreateRideCars();
   } else {
     createRideSection.style.display = "none";
     modeToggleBtn.textContent = "Switch to Driver Mode";
     rideListTitle.textContent = "Rides";
+    bookRideBtn.style.display = "inline-block";
+    clearCreationMarkers();
   }
 
   renderCurrentRideList();
+  updateBookButtonState();
 }
 
 function setupModeToggle() {
@@ -501,9 +642,83 @@ function setupCurrentLocationButton() {
       };
 
       map.setView(userLatLng, 13);
-      setStartMarker(userLatLng);
-      updateLocationInputFromMarker("start");
+
+      if (dashboardMode === "driver") {
+        setStartMarker(userLatLng);
+        updateLocationInputFromMarker("start");
+        return;
+      }
+
+      setUserLocationMarker(userLatLng);
     });
+  });
+}
+
+function updateBookButtonState() {
+  if (dashboardMode !== "user") {
+    bookRideBtn.disabled = true;
+    return;
+  }
+
+  const seatsAvailable = selectedRide && Number(selectedRide.available_seats) > 0;
+  bookRideBtn.disabled = !seatsAvailable;
+}
+
+async function setupBookRideButton() {
+  bookRideBtn.addEventListener("click", async () => {
+    hideBookingMessage();
+
+    if (!selectedRide) {
+      showBookingMessage("Select a ride first.");
+      return;
+    }
+
+    if (Number(selectedRide.available_seats) <= 0) {
+      updateBookButtonState();
+      showBookingMessage("No seats are available for this ride.");
+      return;
+    }
+
+    if (!userLocationMarker) {
+      showBookingMessage("Place your location with the blue marker before booking.");
+      return;
+    }
+
+    const latlng = userLocationMarker.getLatLng();
+    bookRideBtn.disabled = true;
+
+    try {
+      const label = await reverseGeocodeLocation(latlng);
+      const response = await fetch(`/paths/${selectedRide.path_id}/book`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lat: latlng.lat,
+          lng: latlng.lng,
+          label
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        showBookingMessage(result.error || "Could not book ride.");
+        updateBookButtonState();
+        return;
+      }
+
+      allRides = allRides.map((ride) => (
+        ride.path_id === result.path_id ? { ...ride, ...result } : ride
+      ));
+      selectedRide = { ...selectedRide, ...result };
+      selectedRideId = result.path_id;
+      showBookingMessage("Ride booked.", "success");
+      renderCurrentRideList();
+      updateBookButtonState();
+    } catch (err) {
+      showBookingMessage("Network error");
+      updateBookButtonState();
+    }
   });
 }
 
@@ -555,6 +770,7 @@ async function setupDashboard() {
   initMap();
   setupSearch();
   setupCurrentLocationButton();
+  setupBookRideButton();
   setupCreateRideLocationInputs();
   setupCarSelectRedirect();
   setupModeToggle();

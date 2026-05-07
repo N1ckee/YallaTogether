@@ -138,6 +138,7 @@ router.get("/all", verify, async (req, res) => {
         p.end_lng,
         p.path_data,
         p.stops,
+        p.passanges,
         u.username AS driver_username,
         c.make,
         c.model,
@@ -153,6 +154,109 @@ router.get("/all", verify, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Could not load rides." });
+  }
+});
+
+router.post("/:pathId/book", verify, async (req, res) => {
+  const pathId = Number(req.params.pathId);
+  const { lat, lng, label } = req.body;
+
+  if (!Number.isInteger(pathId) || pathId <= 0) {
+    return res.status(400).json({ error: "Invalid ride id." });
+  }
+
+  if (lat === undefined || lng === undefined || lat === "" || lng === "") {
+    return res.status(400).json({ error: "Select your location before booking." });
+  }
+
+  const stopLat = Number(lat);
+  const stopLng = Number(lng);
+
+  if (!Number.isFinite(stopLat) || !Number.isFinite(stopLng)) {
+    return res.status(400).json({ error: "Selected location is invalid." });
+  }
+
+  let client;
+
+  try {
+    client = await pool.connect();
+    await client.query("BEGIN");
+
+    const pathResult = await client.query(
+      `SELECT path_id, available_seats, stops, passanges
+       FROM paths
+       WHERE path_id = $1
+       FOR UPDATE`,
+      [pathId]
+    );
+
+    if (pathResult.rows.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ error: "Ride not found." });
+    }
+
+    const ride = pathResult.rows[0];
+
+    if (ride.available_seats <= 0) {
+      await client.query("ROLLBACK");
+      return res.status(409).json({ error: "No seats are available for this ride." });
+    }
+
+    const passanges = Array.isArray(ride.passanges) ? ride.passanges : [];
+
+    if (passanges.some((passenger) => passenger.user_id === req.user.user_id)) {
+      await client.query("ROLLBACK");
+      return res.status(409).json({ error: "You have already booked this ride." });
+    }
+
+    const stops = Array.isArray(ride.stops) ? ride.stops : [];
+    const bookedAt = new Date().toISOString();
+
+    const stop = {
+      user_id: req.user.user_id,
+      username: req.user.username,
+      lat: stopLat,
+      lng: stopLng,
+      label: label || "",
+      booked_at: bookedAt
+    };
+
+    const passenger = {
+      user_id: req.user.user_id,
+      username: req.user.username,
+      stop: {
+        lat: stopLat,
+        lng: stopLng,
+        label: label || ""
+      },
+      booked_at: bookedAt
+    };
+
+    const updatedResult = await client.query(
+      `UPDATE paths
+       SET
+        available_seats = available_seats - 1,
+        stops = $1::jsonb,
+        passanges = $2::jsonb
+       WHERE path_id = $3
+       RETURNING *`,
+      [
+        JSON.stringify([...stops, stop]),
+        JSON.stringify([...passanges, passenger]),
+        pathId
+      ]
+    );
+
+    await client.query("COMMIT");
+    res.json(updatedResult.rows[0]);
+  } catch (err) {
+    if (client) {
+      await client.query("ROLLBACK");
+    }
+    console.error(err);
+    res.status(500).json({ error: "Could not book ride." });
+  } finally {
+    client?.release();
   }
 });
 

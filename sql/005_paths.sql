@@ -15,6 +15,7 @@ CREATE TABLE paths (
   end_lng FLOAT NOT NULL,
   path_data JSONB NOT NULL,
   stops JSONB,
+  passanges JSONB DEFAULT '[]'::jsonb,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (driver_id) REFERENCES drivers(driver_id) ON DELETE CASCADE,
   FOREIGN KEY (car_id) REFERENCES cars(car_id) ON DELETE CASCADE
