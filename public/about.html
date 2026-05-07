@@ -1,131 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
+<section class="about-section">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About | YallaTogether</title>
+  <div class="about-text">
+    <h1>About Yalla Together</h1>
 
-  <link rel="stylesheet" href="/css/style.css">
-</head>
+    <p>
+      Yalla Together is a ride-sharing platform designed to connect
+      drivers and passengers in a safe, simple, and efficient way.
+    </p>
 
-<body>
+    <p>
+      Our goal is to reduce transportation costs, improve accessibility,
+      and build a trusted community for shared journeys.
+    </p>
 
-  <!-- Header -->
-  <header class="header">
+    <p>
+      Drivers can share available seats in their cars while passengers
+      can easily find affordable rides.
+    </p>
+  </div>
 
-    <div class="logo-wrapper">
-      <img src="/images/yalla-together.svg" class="logo" alt="logo">
-    </div>
+  <div class="about-image">
+    <img src="images/yalla3.png" alt="About us">
+  </div>
 
-    <nav>
-      <a href="startpage.html">Home</a>
-      <a href="about.html">About</a>
-      <a href="support.html">Support</a>
-      <a href="terms-condition.html">Terms</a>
-    </nav>
+</section>
 
-  </header>
+<section class="features">
 
-  <!-- Title -->
-  <h1 class="about-title reveal">
-    About Yalla Together
-  </h1>
+  <div class="features-grid">
 
-  <!-- About Section -->
-  <section class="about-section">
-
-    <div class="about-text reveal">
+    <div class="feature">
+      <h3>🚗 Easy Rides</h3>
 
       <p>
-        Yalla Together is a ride-sharing platform designed to connect
-        drivers and passengers in a safe, simple, and efficient way.
+        Quickly find drivers or passengers going the same way.
       </p>
+    </div>
+
+    <div class="feature">
+      <h3>🔒 Safe Trips</h3>
 
       <p>
-        Our goal is to reduce transportation costs, improve accessibility,
-        and build a trusted community for shared journeys.
+        Travel with verified users and trusted community members.
       </p>
+    </div>
+
+    <div class="feature">
+      <h3>💰 Affordable</h3>
 
       <p>
-        Drivers can share available seats in their cars while passengers
-        can easily find affordable rides.
+        Share costs and travel cheaper than traditional transport.
       </p>
-
     </div>
 
-    <div class="about-image reveal reveal-image">
-      <img src="/images/yalla3.png" alt="About us">
+    <div class="feature">
+      <h3>⚡ Fast Booking</h3>
+
+      <p>
+        Book your ride within seconds.
+      </p>
     </div>
 
-  </section>
+  </div>
 
-  <!-- Features -->
-  <section class="features">
-
-    <div class="features-grid">
-
-      <div class="feature reveal">
-        <h3>🚗 Easy Rides</h3>
-
-        <p>
-          Quickly find drivers or passengers going the same way.
-        </p>
-      </div>
-
-      <div class="feature reveal">
-        <h3>🔒 Safe Trips</h3>
-
-        <p>
-          Travel with verified users and trusted community members.
-        </p>
-      </div>
-
-      <div class="feature reveal">
-        <h3>💰 Affordable</h3>
-
-        <p>
-          Share costs and travel cheaper than traditional transport.
-        </p>
-      </div>
-
-      <div class="feature reveal">
-        <h3>⚡ Fast Booking</h3>
-
-        <p>
-          Book your ride within seconds.
-        </p>
-      </div>
-
-    </div>
-
-  </section>
-
-  <!-- Footer -->
-  <footer class="footer">
-
-    <a href="startpage.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="support.html">Support</a>
-    <a href="terms-condition.html">Terms</a>
-
-  </footer>
-
-  <script>
-    const reveals = document.querySelectorAll(".reveal");
-
-    window.addEventListener("scroll", () => {
-      reveals.forEach((element) => {
-        const windowHeight = window.innerHeight;
-        const revealTop = element.getBoundingClientRect().top;
-
-        if (revealTop < windowHeight - 100) {
-          element.classList.add("show");
-        }
-      });
-    });
-  </script>
-
-</body>
-
-</html>
+</section>
