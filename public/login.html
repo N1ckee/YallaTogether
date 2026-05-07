@@ -1,24 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login</title>
-    <link href="css/style.css" rel="stylesheet">
-    <script src="js/login.js" defer></script>
-  </head>
-  <body>
-    <h1>Login</h1>
-    <form id="login_form">
-      <label for="username">Username or Email:</label>
-      <input type="text" id="identifier" name="identifier" required>
-      <br>
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required>
-      <br>
-      <p style="color: red; display: none;" id="error_message">Error</p>
-      <button type="submit">Login</button>
-    </form>
-    <p>Don't have an account? <a href="register.html">Register here</a></p>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login</title>
+
+  <link href="css/style.css" rel="stylesheet">
+  <script src="js/login.js" defer></script>
+</head>
+
+<body class="login-body">
+
+  <div class="login-wrapper">
+
+    <div class="login-card">
+
+      <img src="images/yalla-together.svg" alt="Yalla Together" class="login-logo">
+
+      <h2>Welcome Back</h2>
+
+      <form id="login_form">
+
+        <input 
+          type="text"
+          id="identifier"
+          name="identifier"
+          placeholder="Username or Email"
+          required
+        >
+
+        <input 
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Password"
+          required
+        >
+
+        <p style="color:red; display:none;" id="error_message">
+          Error
+        </p>
+
+        <p class="forgot">
+          <a href="#">Forgot password?</a>
+        </p>
+
+        <button type="submit" class="login-btn">
+          Log In
+        </button>
+
+      </form>
+
+      <p class="create-text">
+        Don’t have an account?
+        <a href="register.html">Register here</a>
+      </p>
+
+    </div>
+
+  </div>
+
+</body>
 </html>
