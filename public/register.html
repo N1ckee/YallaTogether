@@ -1,47 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Register</title>
-    <link href="css/style.css" rel="stylesheet">
-    <script src="js/register.js" defer></script>
-  </head>
-  <body>
-    <div id="registerPage">
-      <h1>Register</h1>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Register</title>
+
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/register.js" defer></script>
+</head>
+
+<body class="login-body">
+
+  <div class="login-wrapper">
+
+    <div class="login-card">
+
+      <img src="images/yalla-together.svg" class="login-logo" alt="Yalla Together">
+
+      <h2>Create Account</h2>
+
       <form id="register_form">
-        <!-- Information needed for registration of a user--->
-        <label for="first_name">First Name:</label>
-        <input type="text" id="first_name" name="first_name" required>
-        <br>
-        <label for="last_name">Last Name:</label>
-        <input type="text" id="last_name" name="last_name" required>
-        <br>
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <br>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <br>
-        <label for="phone_number">Phone Number:</label>
-        <input type="tel" id="phone_number" name="phone_number" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required> 
-        <br>
 
-        <!-- Information needed for registration of a driver--->
-        <label for="driver">Register as a driver?</label>
-        <input type="checkbox" id="driver" name="role" value="driver">
+        <input type="text"
+               id="first_name"
+               name="first_name"
+               placeholder="First Name"
+               required>
 
-        <span style="display:none;" id="license_field">
-            <label for="license_number">License Number:</label>
-            <input type="text" id="license_number" name="license_number">
-        </span>
-        <p style="color: red; display: none;" id="error_message">Error</p>
-        <button type="submit">Register</button>
+        <input type="text"
+               id="last_name"
+               name="last_name"
+               placeholder="Last Name"
+               required>
+
+        <input type="text"
+               id="username"
+               name="username"
+               placeholder="Username"
+               required>
+
+        <input type="email"
+               id="email"
+               name="email"
+               placeholder="Email"
+               required>
+
+        <input type="tel"
+               id="phone_number"
+               name="phone_number"
+               placeholder="Phone Number"
+               required>
+
+        <input type="password"
+               id="password"
+               name="password"
+               placeholder="Password"
+               required>
+
+        <div class="role-options">
+
+          <label>
+            <input type="checkbox"
+                   id="driver"
+                   name="role"
+                   value="driver">
+
+            Register as Driver
+          </label>
+
+        </div>
+
+        <div id="license_field" class="hidden">
+
+          <input type="text"
+                 id="license_number"
+                 name="license_number"
+                 placeholder="License Number">
+
+        </div>
+
+        <p class="error hidden" id="error_message">
+          Error
+        </p>
+
+        <button type="submit" class="login-btn">
+          Register
+        </button>
+
       </form>
+
+      <p class="create-text">
+        Already have an account?
+        <a href="login.html">Login</a>
+      </p>
+
     </div>
-  </body>
+
+  </div>
+
+</body>
+
 </html>
