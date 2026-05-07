@@ -397,12 +397,12 @@ button:hover {
   justify-content: center;
 }
 
-.login-body::before {
+/*.login-body::before {
   content: "";
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.55);
-}
+}*/
 
 .login-wrapper {
   position: relative;
