@@ -1118,17 +1118,22 @@ align-items:stretch;
 
 .cars-body {
     margin: 0;
-    padding: 40px 20px;
     min-height: 100vh;
     background: linear-gradient(135deg, #edf4ff, #dbeafe);
     font-family: Arial, sans-serif;
-}
 
-.cars-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+
+    padding: 20px;
+}
+
+.cars-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  
 }
 
 .cars-card {
