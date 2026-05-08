@@ -378,7 +378,17 @@ function calculateArrivalTime(departureTime, durationMinutes) {
   }
 
   departure.setMinutes(departure.getMinutes() + durationMinutes);
-  return departure.toISOString();
+  return formatDateTimeForInput(departure);
+}
+
+function formatDateTimeForInput(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
 function clearRideMarkers() {
@@ -412,7 +422,14 @@ function formatDateTime(value) {
     return "N/A";
   }
 
-  return new Date(value).toLocaleString();
+  return new Date(value).toLocaleString("sv-SE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  });
 }
 
 function parseRidePath(pathData) {
@@ -688,6 +705,7 @@ async function setDashboardMode(mode) {
     createRideSection.style.display = "block";
     modeToggleBtn.textContent = "Switch to User Mode";
     rideListTitle.textContent = "Your Rides";
+    rideList.classList.remove("ride-list-scroll");
     bookRideBtn.style.display = "none";
     removeRideBtn.style.display = "inline-block";
     clearUserLocationMarker();
@@ -696,6 +714,7 @@ async function setDashboardMode(mode) {
     createRideSection.style.display = "none";
     modeToggleBtn.textContent = "Switch to Driver Mode";
     rideListTitle.textContent = "Rides";
+    rideList.classList.add("ride-list-scroll");
     bookRideBtn.style.display = "inline-block";
     removeRideBtn.style.display = "none";
     clearCreationMarkers();
@@ -927,6 +946,7 @@ async function setupDashboard() {
 
   usernameElement.textContent = currentUser.username;
   ratingElement.textContent = currentUser.user_rating ?? 0;
+  rideList.classList.add("ride-list-scroll");
 
   allRides = await loadRides();
   renderCurrentRideList();

@@ -840,6 +840,12 @@ margin-top:30px;
   font-size: 15px;
 }
 
+.ride-list-scroll {
+  max-height: 560px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
 /* boka butten*/
 .book-btn {
   margin-top: 10px;
