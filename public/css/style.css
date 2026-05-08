@@ -1115,3 +1115,149 @@ align-items:stretch;
 }
 
 }
+
+.cars-body {
+    margin: 0;
+    padding: 40px 20px;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #edf4ff, #dbeafe);
+    font-family: Arial, sans-serif;
+}
+
+.cars-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.cars-card {
+    width: 100%;
+    max-width: 850px;
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+}
+
+.cars-logo {
+    width: 180px;
+    display: block;
+    margin: 0 auto 25px;
+}
+
+#car_list {
+    margin-bottom: 40px;
+}
+
+#car_list h1 {
+    text-align: center;
+    color: #1e3a8a;
+    margin-bottom: 20px;
+}
+
+#cars {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#cars li {
+    background: #f8fbff;
+    border-left: 5px solid #2563eb;
+    padding: 18px;
+    border-radius: 14px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+#addCar h2 {
+    text-align: center;
+    color: #1e3a8a;
+    margin-bottom: 30px;
+}
+
+#add_car_form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#add_car_form label {
+    font-weight: 600;
+    color: #374151;
+}
+
+#add_car_form input[type="text"],
+#add_car_form input[type="number"] {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    background: #f9fafb;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: 0.3s;
+}
+
+#add_car_form input:focus {
+    border-color: #2563eb;
+    outline: none;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+.fuel-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.fuel-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8fbff;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #dbeafe;
+}
+
+#add_car_form button {
+    margin-top: 15px;
+    background: linear-gradient(to right, #1d4ed8, #2563eb);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#add_car_form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37,99,235,0.25);
+}
+
+#error_message {
+    text-align: center;
+    font-weight: bold;
+}
+
+@media (max-width: 700px) {
+
+    .cars-card {
+        padding: 25px;
+    }
+
+    .fuel-options {
+        grid-template-columns: 1fr;
+    }
+
+    .cars-logo {
+        width: 150px;
+    }
+}
