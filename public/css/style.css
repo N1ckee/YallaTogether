@@ -1403,38 +1403,38 @@ align-items:stretch;
 
     color: green;
 }
-.dashboard-topbar{
-    width: 100%;
+.dashboard-header{
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
 
-    padding: 15px 30px;
-    background: white;
-
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-.dashboard-logo{
-    width: 180px;
+.dashboard-main-logo{
+    width: 260px;
     height: auto;
+
+    margin-bottom: 15px;
 }
 
-.home-btn{
-    background: linear-gradient(135deg, #355CFF, #4A6CFF);
-    color: white;
-
+.dashboard-home-btn{
     text-decoration: none;
 
-    padding: 12px 24px;
+    background: linear-gradient(135deg, #355CFF, #4A6CFF);
 
-    border-radius: 12px;
+    color: white;
+
+    padding: 12px 40px;
+
+    border-radius: 14px;
 
     font-weight: bold;
 
     transition: 0.3s;
 }
 
-.home-btn:hover{
+.dashboard-home-btn:hover{
     transform: translateY(-2px);
 }
