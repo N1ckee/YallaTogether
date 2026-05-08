@@ -7,58 +7,90 @@
     <link href="css/style.css" rel="stylesheet">
     <script src="js/cars.js" defer></script>
   </head>
-  <body>
-    <main id="cars_page" style="display: none;">
-    <div id="car_list">
-      <h1>My Cars</h1>
-      <ul id="cars"></ul>
-    </div>
-    <div id="addCar">
-      <h2>Add a New Car</h2>
-      <form id="add_car_form">
-        <label for="make">Make:</label>
-        <input type="text" id="make" name="make" required>
-        <br>
-        <label for="model">Model:</label>
-        <input type="text" id="model" name="model" required>
-        <br>
-        <label for="year">Year:</label>
-        <input type="number" id="year" name="year" required>
-        <br>
-        <label for="color">Color:</label>
-        <input type="text" id="color" name="color">
-        <br>
-        <label for="passenger_capacity">Passenger Capacity:</label>
-        <input type="number" id="passenger_capacity" name="passenger_capacity" required>
+<body class="cars-body">
 
-        <label for="license_plate">License Plate:</label>
-        <input type="text" id="license_plate" name="license_plate" required>
-        <br>
-        <label for="fuel_type">Fuel Type:</label>
-        <br>
-        <span>
-          <label for="fuel_type_gasoline">Gasoline</label>
-          <input type="radio" id="fuel_type_gasoline" name="fuel_type" value="gasoline" required>
-        </span>
-        <span>
-          <label for="fuel_type_diesel">Diesel</label>
-          <input type="radio" id="fuel_type_diesel" name="fuel_type" value="diesel">
-        </span>
-        <span>
-          <label for="fuel_type_hybrid">Hybrid</label>
-          <input type="radio" id="fuel_type_hybrid" name="fuel_type" value="hybrid">
-        </span>
-        <span>
-          <label for="fuel_type_electric">Electric</label>
-          <input type="radio" id="fuel_type_electric" name="fuel_type" value="electric">
-        </span>
-        <label for="fuel_efficiency">Fuel Efficiency (L/100km):</label>
-        <input type="number" id="fuel_efficiency" name="fuel_efficiency" step="0.1">
-        <p style="color: red; display: none;" id="error_message">Error</p>
-        <button type="submit">Add Car</button>
-      </form>
+  <main id="cars_page" class="cars-wrapper" style="display: none;">
 
+    <div class="cars-card">
+      <img src="images/yalla-together.svg"
+     alt="Yalla Together"
+     class="cars-logo">
+
+      <div id="car_list">
+        <h1>My Cars</h1>
+        <ul id="cars"></ul>
+      </div>
+
+      <div id="addCar">
+
+        <h2>Add a New Car</h2>
+
+        <form id="add_car_form">
+
+          <label for="make">Make:</label>
+          <input type="text" id="make" name="make" required>
+
+          <label for="model">Model:</label>
+          <input type="text" id="model" name="model" required>
+
+          <label for="year">Year:</label>
+          <input type="number" id="year" name="year" required>
+
+          <label for="color">Color:</label>
+          <input type="text" id="color" name="color">
+
+          <label for="passenger_capacity">Passenger Capacity:</label>
+          <input type="number" id="passenger_capacity" name="passenger_capacity" required>
+
+          <label for="license_plate">License Plate:</label>
+          <input type="text" id="license_plate" name="license_plate" required>
+
+          <label>Fuel Type:</label>
+
+          <div class="fuel-options">
+
+            <label class="fuel-option">
+              <input type="radio" id="fuel_type_gasoline" name="fuel_type" value="gasoline" required>
+              Gasoline
+            </label>
+
+            <label class="fuel-option">
+              <input type="radio" id="fuel_type_diesel" name="fuel_type" value="diesel">
+              Diesel
+            </label>
+
+            <label class="fuel-option">
+              <input type="radio" id="fuel_type_hybrid" name="fuel_type" value="hybrid">
+              Hybrid
+            </label>
+
+            <label class="fuel-option">
+              <input type="radio" id="fuel_type_electric" name="fuel_type" value="electric">
+              Electric
+            </label>
+
+          </div>
+
+          <label for="fuel_efficiency">
+            Fuel Efficiency (L/100km):
+          </label>
+
+          <input type="number"
+                 id="fuel_efficiency"
+                 name="fuel_efficiency"
+                 step="0.1">
+
+          <p style="color: red; display: none;"
+             id="error_message">
+             Error
+          </p>
+
+          <button type="submit">
+            Add Car
+          </button>
+        </form>
+      </div>
     </div>
-    </main>
+  </main>
   </body>
 </html>
