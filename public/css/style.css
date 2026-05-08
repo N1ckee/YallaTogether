@@ -1127,7 +1127,8 @@ align-items:stretch;
 .cars-wrapper {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
+    min-height: 100vh;
 }
 
 .cars-card {
@@ -1140,9 +1141,9 @@ align-items:stretch;
 }
 
 .cars-logo {
-    width: 180px;
+    width: 260px;
     display: block;
-    margin: 0 auto 25px;
+    margin: 0 auto 30px;
 }
 
 #car_list {
