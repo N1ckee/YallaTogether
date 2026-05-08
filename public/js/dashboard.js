@@ -6,6 +6,7 @@ const carSelect = document.getElementById("car_id");
 const modeToggleBtn = document.getElementById("mode_toggle_btn");
 const startLocationInput = document.getElementById("start_location");
 const endLocationInput = document.getElementById("end_location");
+const departureTimeInput = document.getElementById("departure_time");
 const rideSearch = document.getElementById("ride-search");
 const rideListTitle = document.getElementById("ride_list_title");
 const rideList = document.getElementById("ride-list");
@@ -466,6 +467,23 @@ function parseRideStops(stopsData) {
   }
 }
 
+function parseRidePassengers(passengersData) {
+  if (Array.isArray(passengersData)) {
+    return passengersData;
+  }
+
+  if (typeof passengersData !== "string") {
+    return [];
+  }
+
+  try {
+    const parsedPassengers = JSON.parse(passengersData);
+    return Array.isArray(parsedPassengers) ? parsedPassengers : [];
+  } catch (err) {
+    return [];
+  }
+}
+
 function clearCreationMarkers() {
   if (startMarker) {
     map.removeLayer(startMarker);
@@ -482,6 +500,16 @@ function driverOwnsRide(ride) {
   return dashboardMode === "driver" &&
     currentUser &&
     ride.driver_username === currentUser.username;
+}
+
+function userHasBookedRide(ride) {
+  if (!currentUser || !ride) {
+    return false;
+  }
+
+  return parseRidePassengers(ride.passanges).some((passenger) => (
+    Number(passenger.user_id) === Number(currentUser.user_id)
+  ));
 }
 
 function addStopMarkersForRide(ride) {
@@ -581,12 +609,20 @@ function displayRides(rides) {
       div.classList.add("selected");
     }
 
+    const isBooked = userHasBookedRide(ride);
+
+    if (isBooked) {
+      div.classList.add("booked");
+    }
+
     const nearestText = ride.search_distance_km !== undefined
       ? `<p>Distance to searched arrival: ${ride.search_distance_km.toFixed(2)} km</p>`
       : "";
+    const bookedText = isBooked ? `<p class="booked-label">Booked</p>` : "";
 
     div.innerHTML = `
       <h3>${ride.start_location} -> ${ride.end_location}</h3>
+      ${bookedText}
       <p>Departure: ${formatDateTime(ride.departure_time)}</p>
       <p>Arrival: ${formatDateTime(ride.arrival_time)}</p>
       <p>Driver: ${ride.driver_username}</p>
@@ -768,7 +804,7 @@ function updateBookButtonState() {
   }
 
   const seatsAvailable = selectedRide && Number(selectedRide.available_seats) > 0;
-  bookRideBtn.disabled = !seatsAvailable;
+  bookRideBtn.disabled = !seatsAvailable || userHasBookedRide(selectedRide);
 }
 
 function updateRemoveButtonState() {
@@ -797,6 +833,12 @@ async function setupBookRideButton() {
     if (Number(selectedRide.available_seats) <= 0) {
       updateRideActionButtonStates();
       showBookingMessage("No seats are available for this ride.");
+      return;
+    }
+
+    if (userHasBookedRide(selectedRide)) {
+      updateRideActionButtonStates();
+      showBookingMessage("You have already booked this ride.");
       return;
     }
 
@@ -910,6 +952,15 @@ function setupCarSelectRedirect() {
   });
 }
 
+function setupDepartureTimeInput() {
+  if (!departureTimeInput) {
+    return;
+  }
+
+  departureTimeInput.lang = "sv-SE";
+  departureTimeInput.min = formatDateTimeForInput(new Date());
+}
+
 async function fillMissingCreateRideCoordinates(data) {
   if (!startMarker) {
     const start = await geocodeLocation(data.start_location);
@@ -935,6 +986,7 @@ async function setupDashboard() {
   setupLogoutButton();
   setupCreateRideLocationInputs();
   setupCarSelectRedirect();
+  setupDepartureTimeInput();
   setupModeToggle();
 
   currentUser = await loadCurrentUser();
