@@ -1403,3 +1403,38 @@ align-items:stretch;
 
     color: green;
 }
+.dashboard-topbar{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 15px 30px;
+    background: white;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.dashboard-logo{
+    width: 180px;
+    height: auto;
+}
+
+.home-btn{
+    background: linear-gradient(135deg, #355CFF, #4A6CFF);
+    color: white;
+
+    text-decoration: none;
+
+    padding: 12px 24px;
+
+    border-radius: 12px;
+
+    font-weight: bold;
+
+    transition: 0.3s;
+}
+
+.home-btn:hover{
+    transform: translateY(-2px);
+}
