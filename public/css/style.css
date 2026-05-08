@@ -1073,6 +1073,7 @@ color:#1e3a8a;
 #mode_toggle_btn,
 #useLocationBtn,
 #bookRideBtn,
+#removeRideBtn,
 #create_ride_form button,
 #logoutBtn{
 background:linear-gradient(90deg,#1e3a8a,#2563eb);
@@ -1088,10 +1089,20 @@ transition:0.3s;
 #mode_toggle_btn:hover,
 #useLocationBtn:hover,
 #bookRideBtn:hover,
+#removeRideBtn:hover,
 #create_ride_form button:hover,
 #logoutBtn:hover{
 transform:translateY(-2px);
 box-shadow:0 10px 20px rgba(37,99,235,0.3);
+}
+
+#removeRideBtn {
+background:#b91c1c;
+}
+
+#removeRideBtn:disabled {
+cursor:not-allowed;
+opacity:0.55;
 }
 
 @media(max-width:1000px){

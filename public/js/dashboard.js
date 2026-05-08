@@ -14,6 +14,7 @@ const rideSuccessMessage = document.getElementById("ride_success_message");
 const distanceInfo = document.getElementById("distanceInfo");
 const useLocationBtn = document.getElementById("useLocationBtn");
 const bookRideBtn = document.getElementById("bookRideBtn");
+const removeRideBtn = document.getElementById("removeRideBtn");
 const bookingMessage = document.getElementById("booking_message");
 const logoutBtn = document.getElementById("logoutBtn");
 
@@ -30,6 +31,7 @@ let currentRoutePath = [];
 let currentRouteDistanceKm = 0;
 let currentRouteEtaMinutes = 0;
 let rideMarkers = [];
+let stopMarkers = [];
 let searchTimer = null;
 let startInputTimer = null;
 let endInputTimer = null;
@@ -193,6 +195,13 @@ function setUserLocationMarker(latlng) {
     .bindPopup("Your location");
 }
 
+function clearUserLocationMarker() {
+  if (userLocationMarker) {
+    map.removeLayer(userLocationMarker);
+    userLocationMarker = null;
+  }
+}
+
 function setStartMarker(latlng) {
   if (startMarker) {
     map.removeLayer(startMarker);
@@ -345,6 +354,7 @@ function clearDisplayedRoute() {
     routeLine = null;
   }
 
+  clearStopMarkers();
   currentRoutePath = [];
   currentRouteDistanceKm = 0;
   currentRouteEtaMinutes = 0;
@@ -374,6 +384,11 @@ function calculateArrivalTime(departureTime, durationMinutes) {
 function clearRideMarkers() {
   rideMarkers.forEach((marker) => map.removeLayer(marker));
   rideMarkers = [];
+}
+
+function clearStopMarkers() {
+  stopMarkers.forEach((marker) => map.removeLayer(marker));
+  stopMarkers = [];
 }
 
 function addRideMarkers(rides) {
@@ -417,6 +432,23 @@ function parseRidePath(pathData) {
   }
 }
 
+function parseRideStops(stopsData) {
+  if (Array.isArray(stopsData)) {
+    return stopsData;
+  }
+
+  if (typeof stopsData !== "string") {
+    return [];
+  }
+
+  try {
+    const parsedStops = JSON.parse(stopsData);
+    return Array.isArray(parsedStops) ? parsedStops : [];
+  } catch (err) {
+    return [];
+  }
+}
+
 function clearCreationMarkers() {
   if (startMarker) {
     map.removeLayer(startMarker);
@@ -427,6 +459,47 @@ function clearCreationMarkers() {
     map.removeLayer(endMarker);
     endMarker = null;
   }
+}
+
+function driverOwnsRide(ride) {
+  return dashboardMode === "driver" &&
+    currentUser &&
+    ride.driver_username === currentUser.username;
+}
+
+function addStopMarkersForRide(ride) {
+  clearStopMarkers();
+
+  if (!driverOwnsRide(ride)) {
+    return;
+  }
+
+  parseRideStops(ride.stops).forEach((stop, index) => {
+    const lat = Number(stop.lat);
+    const lng = Number(stop.lng);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return;
+    }
+
+    const popupContent = document.createElement("div");
+    const stopName = document.createElement("strong");
+    const stopLabel = document.createElement("div");
+
+    stopName.textContent = stop.username ? `${stop.username}'s stop` : `Stop ${index + 1}`;
+    stopLabel.textContent = stop.label || "";
+    popupContent.append(stopName);
+
+    if (stop.label) {
+      popupContent.append(stopLabel);
+    }
+
+    const marker = L.marker([lat, lng], { icon: blueIcon })
+      .addTo(map)
+      .bindPopup(popupContent);
+
+    stopMarkers.push(marker);
+  });
 }
 
 function loadRidePath(ride, ridesToRender = getVisibleRides()) {
@@ -466,8 +539,9 @@ function loadRidePath(ride, ridesToRender = getVisibleRides()) {
     .addTo(map)
     .bindPopup(`Destination: ${ride.end_location}`);
 
+  addStopMarkersForRide(ride);
   displayRides(ridesToRender);
-  updateBookButtonState();
+  updateRideActionButtonStates();
 }
 
 function displayRides(rides) {
@@ -615,17 +689,20 @@ async function setDashboardMode(mode) {
     modeToggleBtn.textContent = "Switch to User Mode";
     rideListTitle.textContent = "Your Rides";
     bookRideBtn.style.display = "none";
+    removeRideBtn.style.display = "inline-block";
+    clearUserLocationMarker();
     await loadCreateRideCars();
   } else {
     createRideSection.style.display = "none";
     modeToggleBtn.textContent = "Switch to Driver Mode";
     rideListTitle.textContent = "Rides";
     bookRideBtn.style.display = "inline-block";
+    removeRideBtn.style.display = "none";
     clearCreationMarkers();
   }
 
   renderCurrentRideList();
-  updateBookButtonState();
+  updateRideActionButtonStates();
 }
 
 function setupModeToggle() {
@@ -675,6 +752,20 @@ function updateBookButtonState() {
   bookRideBtn.disabled = !seatsAvailable;
 }
 
+function updateRemoveButtonState() {
+  if (dashboardMode !== "driver") {
+    removeRideBtn.disabled = true;
+    return;
+  }
+
+  removeRideBtn.disabled = !selectedRide || !driverOwnsRide(selectedRide);
+}
+
+function updateRideActionButtonStates() {
+  updateBookButtonState();
+  updateRemoveButtonState();
+}
+
 async function setupBookRideButton() {
   bookRideBtn.addEventListener("click", async () => {
     hideBookingMessage();
@@ -685,7 +776,7 @@ async function setupBookRideButton() {
     }
 
     if (Number(selectedRide.available_seats) <= 0) {
-      updateBookButtonState();
+      updateRideActionButtonStates();
       showBookingMessage("No seats are available for this ride.");
       return;
     }
@@ -714,7 +805,7 @@ async function setupBookRideButton() {
 
       if (!response.ok) {
         showBookingMessage(result.error || "Could not book ride.");
-        updateBookButtonState();
+        updateRideActionButtonStates();
         return;
       }
 
@@ -723,12 +814,51 @@ async function setupBookRideButton() {
       ));
       selectedRide = { ...selectedRide, ...result };
       selectedRideId = result.path_id;
+      addStopMarkersForRide(selectedRide);
       showBookingMessage("Ride booked.", "success");
       renderCurrentRideList();
-      updateBookButtonState();
+      updateRideActionButtonStates();
     } catch (err) {
       showBookingMessage("Network error");
-      updateBookButtonState();
+      updateRideActionButtonStates();
+    }
+  });
+}
+
+function setupRemoveRideButton() {
+  removeRideBtn.addEventListener("click", async () => {
+    hideBookingMessage();
+
+    if (!selectedRide) {
+      showBookingMessage("Select one of your rides first.");
+      return;
+    }
+
+    removeRideBtn.disabled = true;
+
+    try {
+      const response = await fetch(`/paths/${selectedRide.path_id}`, {
+        method: "DELETE"
+      });
+      const result = await response.json();
+
+      if (!response.ok) {
+        showBookingMessage(result.error || "Could not remove ride.");
+        updateRideActionButtonStates();
+        return;
+      }
+
+      allRides = allRides.filter((ride) => ride.path_id !== result.path_id);
+      selectedRideId = null;
+      selectedRide = null;
+      clearDisplayedRoute();
+      clearCreationMarkers();
+      showBookingMessage("Ride removed.", "success");
+      renderCurrentRideList();
+      updateRideActionButtonStates();
+    } catch (err) {
+      showBookingMessage("Network error");
+      updateRideActionButtonStates();
     }
   });
 }
@@ -782,6 +912,7 @@ async function setupDashboard() {
   setupSearch();
   setupCurrentLocationButton();
   setupBookRideButton();
+  setupRemoveRideButton();
   setupLogoutButton();
   setupCreateRideLocationInputs();
   setupCarSelectRedirect();

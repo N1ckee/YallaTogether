@@ -157,6 +157,38 @@ router.get("/all", verify, async (req, res) => {
   }
 });
 
+router.delete("/:pathId", verify, async (req, res) => {
+  const pathId = Number(req.params.pathId);
+
+  if (!Number.isInteger(pathId) || pathId <= 0) {
+    return res.status(400).json({ error: "Invalid ride id." });
+  }
+
+  try {
+    const driverId = await getDriverId(req.user.user_id);
+
+    if (!driverId) {
+      return res.status(403).json({ error: "Only registered drivers can remove rides." });
+    }
+
+    const result = await pool.query(
+      `DELETE FROM paths
+       WHERE path_id = $1 AND driver_id = $2
+       RETURNING path_id`,
+      [pathId, driverId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Ride not found or does not belong to this driver." });
+    }
+
+    res.json({ path_id: result.rows[0].path_id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Could not remove ride." });
+  }
+});
+
 router.post("/:pathId/book", verify, async (req, res) => {
   const pathId = Number(req.params.pathId);
   const { lat, lng, label } = req.body;
